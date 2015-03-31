@@ -28,13 +28,13 @@ for wifiFrame in sys.stdin:
     macData[0] = time
     macData[1] = size
     macData[2] = seqNum
-  elif (macData[2] > seqNum + 3400):
+  if (macData[2] > seqNum + 3400):
     seqNum += 4096
     #print "rolling"
-  elif (macData[2] > seqNum):
+  if (macData[2] >= seqNum):
     #print "skipping"
     continue
-  elif (seqNum - macData[2] > 500):
+  if (seqNum - macData[2] > 200):
     continue
   
   numMissing = seqNum - macData[2] - 1

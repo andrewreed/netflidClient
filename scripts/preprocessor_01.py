@@ -14,6 +14,7 @@ for wifiFrame in sys.stdin:
     minute = int(timestamp[1])
     seconds = float(timestamp[2])
     time = 3600*hour + 60*minute + seconds
+    time = float('%.3f'%(time))
     if (lastTime < 0.0):
       lastTime = time
     if ((time - lastTime > 30) or (time < lastTime)):

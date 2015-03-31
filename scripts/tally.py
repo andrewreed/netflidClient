@@ -15,42 +15,28 @@ def readFromServer(clntsock):
       break
     sys.stdout.write(results)
 
-# check a bin list for valid alignments
-#  (i.e. more than 75% of the data was transmitted in the first 2 seconds
-#   of each 4 second slice)
-def checkDeque(mac, binList, clntsock):
+def sendDeque(mac, binList, clntsock):
   if (len(binList) < 480):
     return
 
   startTime = binList[0][0]
 
   chunkList = []
-
-  allHalfChunkSum = 0.0
-  allChunkSum = 0.0
-
-  halfChunkSize = 0
   chunkSize = 0
   count = 0
 
   for currentBin in binList:
     count += 1
     chunkSize += currentBin[1]
-    if (count <= 8):
-      halfChunkSize += currentBin[1]
     if (count == 16):
       chunkList.append(chunkSize)
-      allHalfChunkSum += halfChunkSize
-      allChunkSum += chunkSize
-      halfChunkSize = 0
       chunkSize = 0
       count = 0
 
-  if (allHalfChunkSum / allChunkSum >= 0.75):
-    output = mac + "\t" + str(startTime) + "\t" + str(int(chunkList[0] * 0.88))
-    for x in range(1,30):
-      output += "," + str(int(chunkList[x] * 0.88))
-    clntsock.send(output + "\n")
+  output = mac + "\t" + str(startTime) + "\t" + str(int(chunkList[0] * 0.9))
+  for x in range(1,30):
+    output += "," + str(int(chunkList[x] * 0.9))
+  clntsock.send(output + "\n")
 
 ### MAIN PROGRAM ###
 serverName = sys.argv[1]
@@ -85,13 +71,13 @@ for wifiFrame in sys.stdin:
   #  even if the bin had no data
   while (time - macData[2] >= 0.25):
     macData[0].append((macData[2],macData[1]))
-    checkDeque(macAddr, macData[0], clientSocket)
+    sendDeque(macAddr, macData[0], clientSocket)
     macData[2] += 0.25
     macData[1] = 0
   macData[1] += frameSize
 # make sure you append the last bin
 macData[0].append((macData[2],macData[1]))
-checkDeque(macAddr, macData[0], clientSocket)
+sendDeque(macAddr, macData[0], clientSocket)
 clientSocket.send("complete\n")
 readerThread.join()
 clientSocket.close()
