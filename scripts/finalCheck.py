@@ -42,5 +42,6 @@ for match in sys.stdin:
         if (numSegments == (matchB[2] - matchA[2])):
           print "Watching: " + macAddr + " " + matchA[1]
           print datetime.datetime.now()
+          sys.exit() ## for testing purposes... you get one shot to ID the movie
           del matchList[:]
           break
